@@ -1,0 +1,81 @@
+global:
+  imageRegistry: ccr.ccs.tencentyun.com
+
+image:
+  registry: ccr.ccs.tencentyun.com
+  repository: k7scn/whoami
+  tag: 2022
+  pullPolicy: IfNotPresent
+
+replicaCount: 1
+
+updateStrategy:
+  type: RollingUpdate
+  rollingUpdate: {}
+
+containerPorts:
+  http: 32379
+
+containerSecurityContext:
+  enabled: false
+  runAsUser: 1001
+  runAsNonRoot: true
+
+resources:
+  ## Example:
+  ## limits:
+  ##    cpu: 100m
+  ##    memory: 128Mi
+  limits: {}
+  ## Examples:
+  ## requests:
+  ##    cpu: 100m
+  ##    memory: 128Mi
+  requests: {}
+
+startupProbe:
+  enabled: false
+  initialDelaySeconds: 30
+  timeoutSeconds: 5
+  periodSeconds: 10
+  failureThreshold: 6
+  successThreshold: 1
+
+livenessProbe:
+  enabled: false
+  initialDelaySeconds: 30
+  timeoutSeconds: 5
+  periodSeconds: 10
+  failureThreshold: 6
+  successThreshold: 1
+
+readinessProbe:
+  enabled: false
+  initialDelaySeconds: 5
+  timeoutSeconds: 3
+  periodSeconds: 5
+  failureThreshold: 3
+  successThreshold: 1
+
+service:
+  type: NodePort
+  ports:
+    http: 32379
+  nodePorts:
+    http: 32379
+  targetPort:
+    http: http
+  sessionAffinity: None
+  externalTrafficPolicy: Cluster
+
+ingress:
+  enabled: false
+  pathType: ImplementationSpecific
+  hostname: nginx.local
+  path: /
+  ingressClassName: "nginx"
+  tls: false
+
+serviceAccount:
+  create: false
+  name: ""
