@@ -74,7 +74,9 @@ ingress:
   hostname: nginx.local
   path: /
   ingressClassName: "nginx"
-  tls: false
+  tls: 
+    enabled: false
+    secretName: tls-ysicing-net
 
 serviceAccount:
   create: false

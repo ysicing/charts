@@ -1,15 +1,25 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "next.fullname" . }}
+  name: {{ template "common.names.fullname" . }}
+  namespace: {{ include "common.names.namespace" . | quote }}
   labels:
     {{- include "next.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
+  {{- if .Values.service.sessionAffinity }}
+  sessionAffinity: {{ .Values.service.sessionAffinity }}
+  {{- end }}
+  {{- if or (eq .Values.service.type "LoadBalancer") (eq .Values.service.type "NodePort") }}
+  externalTrafficPolicy: {{ .Values.service.externalTrafficPolicy | quote }}
+  {{- end }}
   ports:
-    - port: {{ .Values.service.port }}
-      targetPort: http
-      protocol: TCP
-      name: http
+    - name: http
+      port: {{ .Values.service.ports.http }}
+      targetPort: {{ .Values.service.targetPort.http }}
+      {{- if and (or (eq .Values.service.type "NodePort") (eq .Values.service.type "LoadBalancer")) (not (empty .Values.service.nodePorts.http)) }}
+      nodePort: {{ .Values.service.nodePorts.http }}
+      {{- end }}
   selector:
-    {{- include "next.selectorLabels" . | nindent 4 }}
+    {{- include "common.labels.matchLabels" . | nindent 4 }}
+    
